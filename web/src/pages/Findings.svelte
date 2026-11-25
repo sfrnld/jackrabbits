@@ -1,6 +1,5 @@
 <script>
   import { untrack } from 'svelte'
-  import Particles from '../lib/Particles.svelte'
   import { i18n } from '../lib/i18n.svelte.js'
   import { L } from '../lib/i18n.svelte.js'
   import { st, say, decide, undoDecision, applyAll } from '../lib/store.svelte.js'
@@ -54,7 +53,7 @@
   {#snippet tools()}<button class="btn secondary sm" onclick={applyAll} disabled={!fs.length || done === fs.length}>{t('c_all')}</button>{/snippet}
 
   {#if st.analysing}
-    <div class="an" role="status" aria-live="polite"><Particles /><b>{t('c_analysing')}</b>
+    <div class="an" role="status" aria-live="polite"><b>{t('c_analysing')}</b>
       <ul>{#each STEPS_A as k, i}<li class:on={i < ai} class:cur={i === ai}><span aria-hidden="true">{i < ai ? '✓' : i === ai ? '…' : '○'}</span> {t('c_an_' + k)}</li>{/each}</ul></div>
   {:else if fs.length}
     <nav class="dots" aria-label={t('c_title')}>

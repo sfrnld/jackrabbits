@@ -4,6 +4,7 @@ from collections import deque
 from pathlib import Path
 import duckdb
 from fastapi import FastAPI, Request
+from . import settings
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -69,8 +70,18 @@ def reset_everything():
 @app.get("/api/status")
 def status(): return {"log": list(LOG)}
 
+def install_id() -> str:
+    """A random id stored in this install's state folder. The browser uses it to tell one install from another
+    (they can share the same address, 127.0.0.1:8765, and therefore the same browser storage)."""
+    import uuid
+    f = settings.state_dir() / "install_id"
+    try:
+        if f.exists() and f.read_text().strip(): return f.read_text().strip()
+        f.parent.mkdir(parents=True, exist_ok=True); i = uuid.uuid4().hex; f.write_text(i); return i
+    except OSError: return "unknown"
+
 @app.get("/api/health")
-def health(): return {"ok": True, "app": "sales-studio", "pid": os.getpid()}
+def health(): return {"ok": True, "app": "sales-studio", "pid": os.getpid(), "install_id": install_id()}
 
 @app.get("/api/setup/check")
 def check(request: Request):

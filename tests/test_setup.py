@@ -151,3 +151,11 @@ def test_missing_sample_file_is_handled_gracefully(tmp_path, monkeypatch):
     item = next(i for i in c.get("/api/setup/check").json()["items"] if i["id"] == "sample")
     assert item["status"] == "warn"                                    # not an error: the sample is optional
     up = c.post("/api/data/upload", files={"file": ("x.csv", "date,outlet,net\n2026-09-01,A,100\n", "text/csv")}); assert up.status_code == 200
+
+def test_health_carries_a_stable_per_install_id(tmp_path, monkeypatch):
+    """The browser compares this id to know a fresh install from the one it saw before."""
+    monkeypatch.setenv("SALES_STUDIO_STATE", str(tmp_path / "a"))
+    a1, a2 = c.get("/api/health").json()["install_id"], c.get("/api/health").json()["install_id"]
+    monkeypatch.setenv("SALES_STUDIO_STATE", str(tmp_path / "b"))
+    b = c.get("/api/health").json()["install_id"]
+    assert a1 == a2 and len(a1) == 32 and b != a1
