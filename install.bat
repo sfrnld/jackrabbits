@@ -2,13 +2,32 @@
 rem Sales Studio installer (Windows). Downloads the app from GitHub (no git needed) and starts it.
 rem   curl -L -o install.bat https://raw.githubusercontent.com/sfrnld/jackrabbits/main/install.bat   then double-click it.
 rem Running it again updates the app in place; your data (.env, state\) is never touched.
-setlocal
+setlocal EnableDelayedExpansion
 set "REPO=sfrnld/jackrabbits"
 set "BRANCH=main"
-if "%SALES_STUDIO_DIR%"=="" set "SALES_STUDIO_DIR=%USERPROFILE%\Sales-Studio"
+rem Where to install: ask, unless SALES_STUDIO_DIR is already set.
+if "%SALES_STUDIO_DIR%"=="" (
+  if exist "%CD%\Mulai.bat" ( set "DIR1=%CD%" ) else ( set "DIR1=%CD%\Sales-Studio" )
+  set "SALES_STUDIO_DIR=%DIR1%"
+  if "%SALES_STUDIO_NO_PROMPT%"=="" (
+    echo Di mana Sales Studio dipasang?
+    echo   1^) Folder saat ini: %DIR1%
+    echo   2^) Folder pengguna: %USERPROFILE%\Sales-Studio
+    echo   3^) Folder lain ^(kamu ketik alamatnya^)
+    set "CH="
+    set /p "CH=Pilih 1, 2, atau 3 [Enter = 1]: "
+    if "!CH!"=="2" set "SALES_STUDIO_DIR=%USERPROFILE%\Sales-Studio"
+    if "!CH!"=="3" (
+      set "PP="
+      set /p "PP=Ketik alamat folder (contoh D:\Aplikasi\Sales-Studio): "
+      if not "!PP!"=="" set "SALES_STUDIO_DIR=!PP!"
+    )
+  )
+)
 if "%SALES_STUDIO_SRC%"=="" (
   set "SALES_STUDIO_SRC=https://github.com/%REPO%/archive/refs/heads/%BRANCH%.zip"
 )
+if exist "%SALES_STUDIO_DIR%\.git" ( echo Maaf, folder ini adalah clone Git ^(bisa ada perubahanmu^). Perbarui dengan: git pull. Installer tidak menimpanya. & pause & exit /b 1 )
 set "TMPD=%TEMP%\sales-studio-dl"
 if exist "%TMPD%" rmdir /s /q "%TMPD%"
 mkdir "%TMPD%"

@@ -11,7 +11,7 @@ Sales Studio mengubah data penjualan mentah menjadi alat yang langsung dipakai m
 > **Mac memblokir file ini?** Klik kanan `Mulai.command` → **Open** → **Open** (sekali saja). Cara cadangan lewat terminal: `cd` ke folder ini, lalu `xattr -d com.apple.quarantine Mulai.command && ./Mulai.command`.
 > Membuka lagi? Peluncur otomatis menutup server Sales Studio lama, jadi kamu selalu mendapat versi terbaru.
 
-> Aplikasi ini dikembangkan oleh agen-agen AI yang diorkestrasi oleh [Aldi](https://www.linkedin.com/in/sefrinaldi). Bisa dibuka di browser HP, tapi lebih nyaman lewat browser desktop.
+> Aplikasi ini bisa dibuka di browser HP, tapi lebih nyaman lewat browser desktop.
 
 ## Memasang & menjalankan
 
@@ -19,7 +19,17 @@ Pilih **salah satu** cara. Cara A paling mudah: satu perintah, tanpa Git, tanpa 
 
 ### Cara A: pasang lewat satu perintah (disarankan)
 
-Perintah ini mengunduh aplikasi dari GitHub ke folder `Sales-Studio` di folder Home-mu, lalu langsung menjalankannya. Tidak perlu Git.
+Perintah ini mengunduh aplikasi dari GitHub lalu langsung menjalankannya. Tidak perlu Git. **Installer menanyakan di mana aplikasi dipasang:**
+
+```
+Di mana Sales Studio dipasang?
+  1) Folder saat ini: /Users/kamu/Documents/Sales-Studio
+  2) Folder pengguna: /Users/kamu/Sales-Studio
+  3) Folder lain (kamu ketik alamatnya)
+Pilih 1, 2, atau 3 [Enter = 1]:
+```
+
+Tekan Enter untuk pilihan 1 (folder tempat kamu menjalankan perintah), atau ketik 2 / 3. Pilihan 3 menerima alamat seperti `~/Projects/Sales-Studio`. Mau melewati pertanyaan (otomatis)? Awali perintah dengan `SALES_STUDIO_DIR=/folder/tujuan`. Di Windows pertanyaannya sama.
 
 **Mac** — buka aplikasi **Terminal** (tekan `Cmd + Spasi`, ketik "Terminal", Enter), tempel, lalu Enter:
 
@@ -35,7 +45,17 @@ curl -L -o install.bat https://raw.githubusercontent.com/sfrnld/jackrabbits/main
 
 Pilihan lain kalau tidak mau memakai terminal: unduh file `install.sh` (Mac, simpan sebagai `Pasang-Sales-Studio.command`) atau `install.bat` (Windows) dari halaman GitHub, lalu **double-click**. Mengunduh dengan `curl` tidak memicu peringatan keamanan Mac/Windows.
 
-Setelah terpasang, lain kali cukup **double-click `Mulai.command` (Mac) atau `Mulai.bat` (Windows)** di folder `Sales-Studio`. Mau memperbarui ke versi terbaru? Jalankan perintah di atas lagi: aplikasi diperbarui, sedangkan token Telegram (`.env`) dan data tersimpan (`state/`) tidak disentuh.
+Setelah terpasang, lain kali cukup **double-click `Mulai.command` (Mac) atau `Mulai.bat` (Windows)** di folder `Sales-Studio` itu. Mau memperbarui ke versi terbaru? Jalankan perintah di atas lagi: aplikasi diperbarui, sedangkan token Telegram (`.env`) dan data tersimpan (`state/`) tidak disentuh.
+
+### Praktik terbaik saat memasang
+
+- **Pasang di folder yang kamu kuasai**, misalnya `~/Documents` atau `~/Projects` (pilihan 1 setelah `cd` ke sana, atau pilihan 3). Aplikasi membuat `Sales-Studio` di sana dan tidak menyentuh file lain.
+- **Hindari folder yang disinkronkan** (iCloud Drive, OneDrive, Dropbox) dan folder sistem. Folder aplikasi berisi `.venv` yang besar, dan `state/` + `.env` berisi data penerima serta token Telegram yang sebaiknya tidak ikut tersinkron ke tempat lain.
+- **Jangan pakai `sudo`.** Installer tidak membutuhkannya; semua masuk ke folder tujuan dan folder `~/.local` (untuk `uv`).
+- **Jangan jalankan skrip dari internet tanpa dibaca.** Cara paling hati-hati (dua langkah): `curl -fsSL https://raw.githubusercontent.com/sfrnld/jackrabbits/main/install.sh -o install.sh`, baca isinya (`less install.sh`; hanya ±30 baris: mengunduh arsip dari GitHub, mengekstrak, menyalin), lalu `bash install.sh`.
+- **Mau versi yang tetap?** Awali dengan `SALES_STUDIO_BRANCH=nama-tag` supaya yang terpasang tidak berubah saat `main` berubah.
+- **Menjalankan lagi di folder aplikasi = memperbarui.** File aplikasi ditimpa dengan versi GitHub; `.env`, `state/`, dan file lain milikmu tidak disentuh. Kalau foldernya **clone Git**, installer menolak dan kamu cukup `git pull` (supaya perubahan lokalmu tidak hilang).
+- **Satu salinan saja yang berjalan.** Peluncur menutup server Sales Studio lama, jadi menjalankan dua salinan bergantian akan saling mematikan. Token Telegram dan `state/` ada per salinan.
 
 ### Cara B: unduh zip
 
@@ -58,7 +78,7 @@ git clone https://github.com/sfrnld/jackrabbits.git Sales-Studio && cd Sales-Stu
 
 Berhenti: tutup jendela peluncur (atau tekan `Ctrl+C` di dalamnya).
 
-*English: run the one-liner above (Terminal on Mac, Command Prompt on Windows). It downloads the app from GitHub into `~/Sales-Studio` (no Git needed) and starts it. Next time, double-click `Mulai.command` / `Mulai.bat`. Re-running the one-liner updates the app and keeps your `.env` and `state/`.*
+*English: run the one-liner above (Terminal on Mac, Command Prompt on Windows). It downloads the app from GitHub into a `Sales-Studio` folder inside the folder where you run it (no Git needed) and starts it. Next time, double-click `Mulai.command` / `Mulai.bat`. Re-running the one-liner updates the app and keeps your `.env` and `state/`.*
 
 > Fork repo ini? Ganti nama repo di `install.sh` (baris `REPO=`) dan `install.bat` (baris `set "REPO=`), atau jalankan dengan `SALES_STUDIO_REPO=namamu/nama-repo`. Pastikan repo publik dan folder `web/dist` ikut ter-commit (aplikasi dikirim dengan tampilan yang sudah di-build, jadi Node tidak diperlukan).
 
