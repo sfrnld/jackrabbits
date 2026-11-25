@@ -69,7 +69,11 @@
         <span class="sp"></span><button class="del" onclick={() => del(i)} aria-label="{t('a_del')} {it.outlet}">✕</button></div>
       {#if it.reason}<div class="why"><span class="wl">{t('a_why')}</span><blockquote class="quote {it.priority === 'opportunity' ? 'ok' : it.priority === 'urgent' ? 'bad' : ''}"><p>{@html glossHtml(it.reason)}</p></blockquote></div>{/if}
       <label>{t('a_action')}<textarea rows="2" value={it.action} oninput={(e) => { it.action = e.currentTarget.value; save() }}></textarea></label>
-      <p class="to {toWho(it).length ? 'ok' : 'quiet'}">{#if stOf(it) === 'done'}✓ {t('a_not_sent')}{:else if toWho(it).length}➤ {t('a_goes_to')} {toWho(it).map((r) => r.name).join(', ')}{:else}{it.owner && it.owner !== 'Belum ditentukan' ? '○ ' + t('a_not_linked') : '⚠️ ' + t('a_assign')}{/if}</p>
+      {#if stOf(it) === 'done'}<p class="to">✓ {t('a_not_sent')}</p>
+      {:else if toWho(it).length}<p class="to ok">➤ {t('a_goes_to')} {toWho(it).map((r) => r.name).join(', ')}</p>
+      {:else if it.owner && it.owner !== 'Belum ditentukan'}
+        <div class="nolink" role="note"><p><b>{it.owner}</b> {L('adalah sales untuk outlet ini dan belum terhubung ke Telegram, jadi aksi ini belum bisa dikirim ke orangnya.', 'is the salesperson for this outlet and is not yet connected to Telegram, so this action cannot be sent to them yet.')}</p>{@render inviteBtn(it.owner)}</div>
+      {:else}<p class="to quiet">⚠️ {t('a_assign')}</p>{/if}
       <div class="seg" role="group" aria-label={t('as_status')}>{#each ST as [k, lab, ic]}<button class:on={stOf(it) === k} class="s-{k}" aria-pressed={stOf(it) === k} onclick={() => setStatus(it, k)}>{ic} {t(lab)}</button>{/each}</div>
       <div class="row">
         <label>{t('a_owner')}<input list="owners" value={it.owner} oninput={(e) => { it.owner = e.currentTarget.value; save() }} /></label>
@@ -83,6 +87,13 @@
   {:else}{#if loaded}<li class="mut">—</li>{/if}{/each}
 </ol>
 
+{#snippet inviteBtn(ow)}
+    {#if conn[ow]?.state === 'wait'}
+          <div class="inv"><input readonly value={conn[ow].link} onfocus={(e) => e.currentTarget.select()} aria-label={L('Tautan undangan', 'Invite link')} />
+            <span class="ib"><button class="cbtn" onclick={() => copyLink(ow)}>{copied === ow ? '✓ ' + L('Tersalin', 'Copied') : L('Salin tautan', 'Copy link')}</button><button class="cbtn" onclick={() => shareLink(ow)}>{L('Bagikan', 'Share')} ↗</button></span>
+            <small class="mut">{L('Menunggu', 'Waiting for')} {ow} {L('menekan Start di Telegram…', 'to press Start in Telegram…')}</small></div>
+        {:else}<button class="cbtn" onclick={() => invite(ow)} disabled={conn[ow]?.state === 'making'}>{conn[ow]?.state === 'making' ? '…' : conn[ow]?.state === 'err' ? L('Coba lagi', 'Try again') : L('Undang', 'Invite') + ' ' + ow}</button>{/if}
+{/snippet}
 {#snippet aside()}
   <div class="ov">
     <section class="blk sumblk">
@@ -95,11 +106,7 @@
     <h3>{t('a_routing')}</h3>
     {#if routes.some((r) => !r.who.length && r.ow && r.ow !== 'Belum ditentukan')}<div class="nb"><b>{routes.filter((r) => !r.who.length && r.ow && r.ow !== 'Belum ditentukan').length} {t('sh_orphans_n')}</b> <button class="lk" onclick={() => router.go('/studio/share')}>{t('a_add_recv')} →</button></div>{/if}
     {#each routes as r}<div class="rt"><b>{r.ow && r.ow !== 'Belum ditentukan' ? r.ow : t('a_no_owner')}</b> <span class="mut">· {r.n} {r.n === 1 ? t('a_item1') : t('a_items')}</span><br />{#if r.who.length}<span class="ok">➤ {r.who.map((x) => x.name).join(', ')}</span>{:else}{#if r.ow && r.ow !== 'Belum ditentukan'}<span class="mut">○ {t('a_not_linked')}</span>
-        {#if conn[r.ow]?.state === 'wait'}
-          <div class="inv"><input readonly value={conn[r.ow].link} onfocus={(e) => e.currentTarget.select()} aria-label={L('Tautan undangan', 'Invite link')} />
-            <span class="ib"><button class="cbtn" onclick={() => copyLink(r.ow)}>{copied === r.ow ? '✓ ' + L('Tersalin', 'Copied') : L('Salin tautan', 'Copy link')}</button><button class="cbtn" onclick={() => shareLink(r.ow)}>{L('Bagikan', 'Share')} ↗</button></span>
-            <small class="mut">{L('Menunggu', 'Waiting for')} {r.ow} {L('menekan Start di Telegram…', 'to press Start in Telegram…')}</small></div>
-        {:else}<button class="cbtn" onclick={() => invite(r.ow)} disabled={conn[r.ow]?.state === 'making'}>{conn[r.ow]?.state === 'making' ? '…' : conn[r.ow]?.state === 'err' ? L('Coba lagi', 'Try again') : L('Undang', 'Invite')}</button>{/if}{:else}<span class="mut">{t('a_assign')}</span>{/if}{/if}</div>{/each}
+        {@render inviteBtn(r.ow)}{:else}<span class="mut">{t('a_assign')}</span>{/if}{/if}</div>{/each}
     <h3>{t('as_attention')}</h3>
     {#if attention.length}<ul class="att">{#each attention as it}<li><button onclick={() => (sel = it.id)}><span class="stat bad">▲ {late(it) ? t('as_late') : t('a_urgent')}</span> <b>{it.outlet || it.action.slice(0, 30)}</b> <span class="mut">{it.owner} · {it.due}</span></button></li>{/each}</ul>
     {:else}<p class="ok">✓ {t('as_none')}</p>{/if}
@@ -149,4 +156,5 @@
 .crow{display:flex;align-items:center;gap:var(--s3);min-height:28px}.crow b{font-size:15.5px}.crow .own{font-size:13px}.crow .sp{flex:1}.pd{width:10px;height:10px;border-radius:50%;background:var(--grey-400);flex:none}.pd.urgent{background:var(--alert-red)}.pd.opportunity{background:var(--ok-green)}.ic{font-size:14px;color:var(--grey-600)}.ic.st-done{color:var(--ok-green)}.chv{color:var(--grey-600)}.it:has(.crow){padding:var(--s3) var(--s4)}.it:has(.crow){border-left-width:3px}
 .inv{display:flex;flex-direction:column;gap:var(--s2);margin-top:var(--s2)}.inv input{width:100%;min-height:36px;border:1px solid var(--grey-200);border-radius:8px;padding:0 var(--s3);font:13px var(--font);color:var(--grey-800);background:var(--paper)}.ib{display:flex;gap:var(--s2);flex-wrap:wrap}.ib .cbtn{margin:0}
 .rt{margin:var(--s3) 0}
+.nolink{display:flex;flex-direction:column;align-items:flex-start;gap:var(--s2);margin:var(--s2) 0;padding:var(--s3) var(--s4);background:var(--grey-50);border:1px solid var(--grey-200);border-left:3px solid var(--ink);border-radius:8px}.nolink p{margin:0;font-size:14px;line-height:1.5}.nolink .inv{width:100%}
 </style>
