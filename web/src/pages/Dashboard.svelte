@@ -120,8 +120,10 @@
     out.push({ kind: 'total', label: monthLabel(per[1]), value: D.main.total.b }); return out
   })
   const barRows = (res) => res.rows.slice(0, 12).map((r) => ({ key: r.key, label: nm(r.key), value: cur(r), badge: per && r.pct != null ? pctSigned(r.pct) : undefined, hi: per ? tone(r.pct) : '', note: per ? `${mfmt(r.a)} → ${mfmt(r.b)}` : undefined }))
-  const scatter = $derived((D.outl ?? []).map((o, i) => ({ id: o.outlet_id, name: o.name, x: o.invoices, y: o.total, weak: i < 5, rank: i + 1, tip: [o.name, `${o.type} · ${o.branch}`, `Total ${rp(o.total)}`, `${o.invoices} invoice · skor ${o.score.toFixed(0)}`] })))
-  const selOutlet = $derived(D.outl?.find((o) => o.outlet_id === sel))
+  // a score always means "against all outlets of its type", whatever the filters: the numbers shown anywhere come from the whole-company list
+  const gOf = (o) => G?.find((x) => x.outlet_id === o.outlet_id) ?? o
+  const scatter = $derived((D.outl ?? []).map((o, i) => ({ id: o.outlet_id, name: o.name, x: o.invoices, y: o.total, weak: i < 5, rank: i + 1, tip: [o.name, `${o.type} · ${o.branch}`, `Total ${rp(o.total)}`, `${o.invoices} invoice · skor ${gOf(o).score.toFixed(0)}`] })))
+  const selOutlet = $derived((() => { const o = D.outl?.find((x) => x.outlet_id === sel); return o && gOf(o) })())
   const pivRows = $derived.by(() => {
     if (!D.piv) return []
     const r = D.piv.rows.map((x) => ({ key: x.key, a: per ? x.a : null, b: cur(x), delta: per ? x.delta : null, pct: per ? x.pct : null }))
@@ -236,7 +238,7 @@
       </div>
     {:else if tab === 'outlet'}
       <Scatter hl={hov} points={scatter} xLabel="Jumlah invoice" yLabel="Net sales" onselect={(id) => (sel = id)} />
-      <ol class="weak">{#each D.outl.slice(0, 5) as o, i}<li onmouseenter={() => (hov = o.outlet_id)} onmouseleave={() => (hov = null)}><button class:on={sel === o.outlet_id} onfocus={() => (hov = o.outlet_id)} onblur={() => (hov = null)} onclick={() => (sel = o.outlet_id)}><span class="rkb">{i + 1}</span> <b class="ent outlet">{o.name}</b> <span class="mut">{@html hl(o.branch)} · {o.type}</span> <span class="neg">▼ {@html scoreSpan(o)} {o.score.toFixed(0)}</span></button>
+      <ol class="weak">{#each D.outl.slice(0, 5).map(gOf) as o, i}<li onmouseenter={() => (hov = o.outlet_id)} onmouseleave={() => (hov = null)}><button class:on={sel === o.outlet_id} onfocus={() => (hov = o.outlet_id)} onblur={() => (hov = null)} onclick={() => (sel = o.outlet_id)}><span class="rkb">{i + 1}</span> <b class="ent outlet">{o.name}</b> <span class="mut">{@html hl(o.branch)} · {o.type}</span> <span class="neg">▼ {@html scoreSpan(o)} {o.score.toFixed(0)}</span></button>
           {@render calcGrid(o)}</li>{/each}</ol>
     {:else if tab === 'sales' && D.sales}
       <BarList rows={barRows(D.sales)} onselect={drill} label="Salesman" fmt={mfmt} />
