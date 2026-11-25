@@ -24,13 +24,13 @@ Perintah ini mengunduh aplikasi dari GitHub ke folder `Sales-Studio` di folder H
 **Mac** — buka aplikasi **Terminal** (tekan `Cmd + Spasi`, ketik "Terminal", Enter), tempel, lalu Enter:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/OWNER/REPO/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/sfrnld/jackrabbits/main/install.sh | bash
 ```
 
 **Windows** — buka **Command Prompt** (tekan tombol Windows, ketik `cmd`, Enter), tempel, lalu Enter:
 
 ```bat
-curl -L -o install.bat https://raw.githubusercontent.com/OWNER/REPO/main/install.bat && install.bat
+curl -L -o install.bat https://raw.githubusercontent.com/sfrnld/jackrabbits/main/install.bat && install.bat
 ```
 
 Pilihan lain kalau tidak mau memakai terminal: unduh file `install.sh` (Mac, simpan sebagai `Pasang-Sales-Studio.command`) atau `install.bat` (Windows) dari halaman GitHub, lalu **double-click**. Mengunduh dengan `curl` tidak memicu peringatan keamanan Mac/Windows.
@@ -45,7 +45,7 @@ Setelah terpasang, lain kali cukup **double-click `Mulai.command` (Mac) atau `Mu
 ### Cara C: pakai Git (untuk yang sudah terbiasa)
 
 ```bash
-git clone https://github.com/OWNER/REPO.git Sales-Studio && cd Sales-Studio && ./Mulai.command   # Windows: Mulai.bat
+git clone https://github.com/sfrnld/jackrabbits.git Sales-Studio && cd Sales-Studio && ./Mulai.command   # Windows: Mulai.bat
 ```
 
 ### Yang terjadi saat pertama kali
@@ -60,7 +60,7 @@ Berhenti: tutup jendela peluncur (atau tekan `Ctrl+C` di dalamnya).
 
 *English: run the one-liner above (Terminal on Mac, Command Prompt on Windows). It downloads the app from GitHub into `~/Sales-Studio` (no Git needed) and starts it. Next time, double-click `Mulai.command` / `Mulai.bat`. Re-running the one-liner updates the app and keeps your `.env` and `state/`.*
 
-> **Untuk pemilik repo:** ganti `OWNER/REPO` di README ini, `install.sh` dan `install.bat` dengan nama repo GitHub-mu (satu perintah: `sed -i '' 's#OWNER/REPO#namamu/sales-studio#g' README.md install.sh install.bat` di Mac). Pastikan repo **publik** dan folder `web/dist` ikut ter-commit (aplikasi dikirim dengan tampilan yang sudah di-build, jadi Node tidak diperlukan).
+> Fork repo ini? Ganti nama repo di `install.sh` (baris `REPO=`) dan `install.bat` (baris `set "REPO=`), atau jalankan dengan `SALES_STUDIO_REPO=namamu/nama-repo`. Pastikan repo publik dan folder `web/dist` ikut ter-commit (aplikasi dikirim dengan tampilan yang sudah di-build, jadi Node tidak diperlukan).
 
 ## Dua bagian aplikasi
 

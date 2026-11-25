@@ -1,15 +1,14 @@
 #!/bin/bash
 # Sales Studio installer (Mac/Linux). Downloads the app from GitHub (no git needed) and starts it.
-#   curl -fsSL https://raw.githubusercontent.com/OWNER/REPO/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/sfrnld/jackrabbits/main/install.sh | bash
 # Running it again updates the app in place; your data (.env, state/) is never touched.
-REPO="${SALES_STUDIO_REPO:-OWNER/REPO}"          # <- GitHub "owner/repo" of this project
+REPO="${SALES_STUDIO_REPO:-sfrnld/jackrabbits}"          # <- GitHub "owner/repo" of this project
 BRANCH="${SALES_STUDIO_BRANCH:-main}"
 DIR="${SALES_STUDIO_DIR:-$HOME/Sales-Studio}"
 URL="${SALES_STUDIO_SRC:-https://github.com/$REPO/archive/refs/heads/$BRANCH.tar.gz}"
 
 fail() { echo; echo "Maaf, pemasangan belum berhasil: $1"; echo "Coba lagi, atau unduh zip dari halaman GitHub lalu double-click Mulai.command."; [ -t 0 ] && read -r -p "Tekan Enter untuk menutup…" _; exit 1; }
 for c in curl tar; do command -v "$c" >/dev/null 2>&1 || fail "'$c' tidak ditemukan di komputer ini."; done
-[ "$REPO" = "OWNER/REPO" ] && [ -z "${SALES_STUDIO_SRC:-}" ] && fail "alamat GitHub belum diisi di install.sh."
 
 echo "Mengunduh Sales Studio dari GitHub…  (sekitar 1 MB, perlu internet)"
 TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT

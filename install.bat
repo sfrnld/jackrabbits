@@ -1,13 +1,12 @@
 @echo off
 rem Sales Studio installer (Windows). Downloads the app from GitHub (no git needed) and starts it.
-rem   curl -L -o install.bat https://raw.githubusercontent.com/OWNER/REPO/main/install.bat   then double-click it.
+rem   curl -L -o install.bat https://raw.githubusercontent.com/sfrnld/jackrabbits/main/install.bat   then double-click it.
 rem Running it again updates the app in place; your data (.env, state\) is never touched.
 setlocal
-set "REPO=OWNER/REPO"
+set "REPO=sfrnld/jackrabbits"
 set "BRANCH=main"
 if "%SALES_STUDIO_DIR%"=="" set "SALES_STUDIO_DIR=%USERPROFILE%\Sales-Studio"
 if "%SALES_STUDIO_SRC%"=="" (
-  if "%REPO%"=="OWNER/REPO" ( echo Maaf, alamat GitHub belum diisi di install.bat. & pause & exit /b 1 )
   set "SALES_STUDIO_SRC=https://github.com/%REPO%/archive/refs/heads/%BRANCH%.zip"
 )
 set "TMPD=%TEMP%\sales-studio-dl"

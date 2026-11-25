@@ -23,7 +23,7 @@ def test_install_sh_installs_and_updates_without_touching_user_data(tmp_path):
     r = run(); assert r.returncode == 0 and "Memperbarui" in r.stdout
     assert (dest / "VERSION").read_text() == "2" and (dest / ".env").read_text() == "TELEGRAM_BOT_TOKEN=keep" and (dest / "state" / "share.json").exists()
 
-def test_install_sh_refuses_unconfigured_repo(tmp_path):
-    env = {k: v for k, v in os.environ.items() if not k.startswith("SALES_STUDIO")}
-    r = subprocess.run(["bash", str(ROOT / "install.sh")], env=env, capture_output=True, text=True, stdin=subprocess.DEVNULL)
-    assert r.returncode != 0 and "belum diisi" in r.stdout
+def test_installers_point_at_the_real_repo_and_have_no_placeholder():
+    for f in ("install.sh", "install.bat", "README.md"):
+        txt = (ROOT / f).read_text(); assert "OWNER/REPO" not in txt, f
+    assert 'sfrnld/jackrabbits' in (ROOT / "install.sh").read_text() and "sfrnld/jackrabbits" in (ROOT / "install.bat").read_text()
