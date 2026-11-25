@@ -1,0 +1,30 @@
+# --- secrets and personal data: NEVER commit these -------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+credentials*.json
+secrets*.json
+# the app's local state: Telegram recipients (chat ids), send history, saved mappings, uploaded data
+state/
+data/uploads/
+*.sqlite
+*.db
+# --- build / local artefacts ------------------------------------------------
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+web/node_modules/
+dist-zip/
+*.zip
+*.log
+.DS_Store
+.idea/
+.vscode/
+.claude/
+.codegraph/
+graphify-out/
+/tmp/

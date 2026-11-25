@@ -1,0 +1,13 @@
+[project]
+name = "sales-studio"
+version = "0.1.0"
+requires-python = ">=3.11,<3.14"
+dependencies = ["fastapi", "uvicorn[standard]", "duckdb", "pandas", "openpyxl", "pyarrow", "matplotlib", "qrcode[pil]", "httpx", "python-multipart"]
+[dependency-groups]
+dev = ["pytest"]
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+filterwarnings = ["ignore::DeprecationWarning"]
+[tool.setuptools]
+packages = ["app"]

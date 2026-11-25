@@ -1,0 +1,15 @@
+#!/bin/bash
+# Blocks commits that would publish secrets or personal data. Install:  bash scripts/install_hooks.sh
+bad=0
+files=$(git diff --cached --name-only --diff-filter=ACM)
+for f in $files; do
+  case "$f" in
+    .env|.env.*|*/.env|*/.env.*) [ "$f" = ".env.example" ] || { echo "✗ $f is a secrets file and must never be committed"; bad=1; } ;;
+    state/*|*.pem|*.key|*.p12|dist-zip/*|*.zip) echo "✗ $f must not be committed (local state, key or build artefact)"; bad=1 ;;
+  esac
+done
+# a Telegram bot token is 8-10 digits, a colon, then 35 letters/digits/-/_ (the pattern below)
+if [ -n "$files" ] && git diff --cached -U0 -- $files | grep -E '^\+' | grep -E '[0-9]{8,10}:[A-Za-z0-9_-]{35}' >/dev/null; then
+  echo "✗ something that looks like a Telegram bot token is in the staged changes"; bad=1
+fi
+[ $bad -eq 0 ] || { echo "Commit blocked. Remove the file/secret (git restore --staged <file>) and try again."; exit 1; }
