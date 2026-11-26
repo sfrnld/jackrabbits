@@ -8,10 +8,10 @@ set "BRANCH=main"
 rem Where to install: ask, unless SALES_STUDIO_DIR is already set.
 if "%SALES_STUDIO_DIR%"=="" (
   if exist "%CD%\Mulai.bat" ( set "DIR1=%CD%" ) else ( set "DIR1=%CD%\Sales-Studio" )
-  set "SALES_STUDIO_DIR=%DIR1%"
+  set "SALES_STUDIO_DIR=!DIR1!"
   if "%SALES_STUDIO_NO_PROMPT%"=="" (
     echo Di mana Sales Studio dipasang?
-    echo   1^) Folder saat ini: %DIR1%
+    echo   1^) Folder saat ini: !DIR1!
     echo   2^) Folder pengguna: %USERPROFILE%\Sales-Studio
     echo   3^) Folder lain ^(kamu ketik alamatnya^)
     set "CH="
